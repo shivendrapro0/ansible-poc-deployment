@@ -1,0 +1,15 @@
+---
+# sequance of execution 
+
+- name: web assets deployment
+  hosts: webservers
+  remote_user: root
+
+  roles:
+    - web
+- name: application code deployment
+  hosts: appservers
+  remote_user: root
+
+  roles:
+    - app

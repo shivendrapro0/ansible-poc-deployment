@@ -1,0 +1,35 @@
+---
+
+  - name: web | Create document root if do not exists 
+    file: path={{ doc_root }} owner=root group=root  state=directory
+
+  - name: deploy | Create Installer Directory
+    file: path={{ installer_dir }}/webdeploy owner=apache group=apache mode=0755 state=directory
+
+  - name: deploy | Download Assets Package 
+    get_url: url={{ jenkins_url }}/{{ build_num }} dest={{ installer_dir }}/webdeploy  mode=0755
+    register: result
+
+  - name: deploy | Delete old temp file
+    command: chdir={{ installer_dir }}/webdeploy /usr/bin/rm -rf temp
+    when: result.changed
+
+  - name: deploy | Creating temp folder again 
+    file: path={{ installer_dir }}/webdeploy/temp owner=apache group=apache mode=0755 state=directory
+    when: result.changed
+
+  - name: deploy | Extract assets tar package
+    command: chdir={{ installer_dir }}/webdeploy /usr/bin/tar -xvf {{ build_num }} -C temp
+    when: result.changed 
+
+  - name: deploy | Delete old assets folder
+    command: chdir={{ doc_root }}/ /usr/bin/rm -rf  ralphlauren
+    when: result.changed
+
+  - name: deploy | Deploy latest assets
+    command: chdir={{ installer_dir }}/webdeploy/temp /usr/bin/unzip -o {{ script_pkg }}
+    when: result.changed
+
+  - name: deploy | Additional step
+    command: chdir={{ doc_root }} /usr/bin/mv {{ installer_dir }}/webdeploy/temp/hybris/bin/custom/ralphlauren/ralphlaurenstorefront/web/webroot  {{ doc_root }}/ralphlauren
+    when: result.changed

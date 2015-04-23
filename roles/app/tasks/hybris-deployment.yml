@@ -1,0 +1,38 @@
+---
+
+   - name: deploy | Create deploy directory
+     file: path={{ installer_dir }}/appdeploy owner={{ application_user }} group={{ application_user }} mode=0777 state=directory
+
+   - name: deploy | Download Tar for deployment
+     get_url: url={{ jenkins_url }}/{{ build_num }} dest={{ installer_dir }}/appdeploy  mode=0777
+     sudo: True
+     sudo_user: "{{ application_user }}"
+     register: latestcode_result
+
+   - name: deploy | Delete old temp dir
+     command: chdir={{ installer_dir }}/appdeploy /usr/bin/rm -rf temp
+     when: latestcode_result.changed
+
+   - name: deploy | Creating temp folder again
+     file: path={{ installer_dir }}/appdeploy/temp owner={{ application_user }} group={{ application_user }} mode=0777 state=directory
+     when: latestcode_result.changed
+
+   - name: deploy | Extract Tar 
+     command: chdir={{ installer_dir }}/appdeploy /usr/bin/tar -xvf {{ build_num }} -C temp
+     sudo: True
+     sudo_user: "{{ application_user }}"
+     when: latestcode_result.changed
+
+   - name: deploy | Unzip Scripts 
+     command: chdir={{ installer_dir }}/appdeploy/temp /usr/bin/unzip -o {{ script_pkg }} 
+     sudo: True
+     sudo_user: "{{ application_user }}"
+     when: latestcode_result.changed
+
+   - name: deploy | Trigger Deployment
+     shell: echo {{ env_name  }} && export APP_HYBRIS_HOME={{ APP_HYBRIS_HOME }} && chmod +x -R . && ./deploy.sh -task codeDeploy -env {{ env_name }}  chdir={{ installer_dir }}/appdeploy/temp/hybris/bnr/scripts/app-scripts/
+     sudo: True
+     sudo_user: "{{ application_user }}"
+     when: latestcode_result.changed
+
+
