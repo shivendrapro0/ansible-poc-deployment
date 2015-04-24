@@ -1,3 +1,3 @@
 ---
-#  - include: hybris-deployment.yml
+  - include: hybris-deployment.yml
   - include: hybris-custom-config.yml
