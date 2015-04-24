@@ -8,5 +8,5 @@ env_name: "CI"
 jvm_route: "rl-app1"
 oracle_password: "aqswdefr#"
 
-hybris_heap_size: "2G"
-hybris_cache: "200000"
+hybris_heap_size: "3G"
+hybris_cache: "300000"
