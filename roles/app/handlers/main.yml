@@ -1,8 +1,14 @@
 ---
+  - name: Ant deploy
+    shell: . ./setantenv.sh && ant deploy  chdir={{ application_home }}/hybris/hybris/bin/platform
+    sudo: true
+    sudo_user: "{{ application_user }}"
+
   - name: Restart hybris
     command:  chdir={{ application_home }}/hybris/hybris/bin/platform/ ./hybrisserver.sh {{ item }}
     with_items:
     - stop
     - start
     sudo: true
-    sudo_user: hybrisadmin
+    sudo_user: "{{ application_user }}"
+

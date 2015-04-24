@@ -31,8 +31,14 @@
 
    - name: deploy | Trigger Deployment
      shell: echo {{ env_name  }} && export APP_HYBRIS_HOME={{ APP_HYBRIS_HOME }} && chmod +x -R . && ./deploy.sh -task codeDeploy -env {{ env_name }}  chdir={{ installer_dir }}/appdeploy/temp/hybris/bnr/scripts/app-scripts/
+     register: deployment
      sudo: True
      sudo_user: "{{ application_user }}"
      when: latestcode_result.changed
 
+   - name: creating a copy of  local.properties
+     shell: cp -r local.properties  local.propertis_latest chdir={{ APP_HYBRIS_HOME }}/config
+     sudo: True
+     sudo_user: "{{ application_user }}"
+     when: deployment.changed
 

@@ -1,0 +1,11 @@
+---
+   - name: Checking for hybris heap size & Configuration
+     template: src=config.properties.j2 dest={{ installer_dir }}/appdeploy/config.properties owner={{ application_user }} group={{ application_user }} mode=0777
+     register: result
+
+   - name: append local.properties
+     shell: cat local.properties_latest {{ installer_dir }}/appdeploy/config.properties > local.properties  chdir={{ APP_HYBRIS_HOME }}/config
+     when: result.changed
+     notify:  
+     - Ant deploy
+     - Restart hybris
