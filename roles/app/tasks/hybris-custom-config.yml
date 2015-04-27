@@ -4,7 +4,7 @@
      register: result
 
    - name: append local.properties
-     shell: cat local.properties_latest {{ installer_dir }}/appdeploy/config.properties > local.properties  chdir={{ APP_HYBRIS_HOME }}/config
+     shell: cat {{ APP_HYBRIS_HOME }}/config/local.properties_latest {{ installer_dir }}/appdeploy/config.properties > local.properties  chdir={{ APP_HYBRIS_HOME }}/config
      when: result.changed
      notify:  
      - Ant deploy
